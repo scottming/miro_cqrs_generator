@@ -11,7 +11,7 @@ URL = f"https://api.miro.com/v2/boards/{BOARD_ID}/sticky_notes"
 CONNECTOR_URL = f"https://api.miro.com/v2-experimental/boards/{BOARD_ID}/connectors"
 
 
-def generate_aggregate(content):
+def build_aggregate_payload(content):
     return {
         "data": {
             "content": f"{content}",
@@ -23,7 +23,7 @@ def generate_aggregate(content):
     }
 
 
-def generate_command(content):
+def build_command_payload(content):
     return {
         "data": {
             "content": f"{content}",
@@ -35,7 +35,7 @@ def generate_command(content):
     }
 
 
-def generate_event(content):
+def build_event_payload(content):
     return {
         "data": {
             "content": f"{content}",
@@ -47,7 +47,7 @@ def generate_event(content):
     }
 
 
-def generate_line(start_id, end_id):
+def build_line_payload(start_id, end_id):
     return {"startItem": {"id": f"{start_id}"}, "endItem": {"id": f"{end_id}"}}
 
 
@@ -68,9 +68,9 @@ if __name__ == "__main__":
     event_content = Content(title="Something Happended", fields=["name"]).to_string()
     command_content = Content(title="Do Something", fields=["name"]).to_string()
 
-    aggregate_payload = generate_aggregate(aggregate_content)
-    event_payload = generate_event(event_content)
-    command_payload = generate_command(command_content)
+    aggregate_payload = build_aggregate_payload(aggregate_content)
+    event_payload = build_event_payload(event_content)
+    command_payload = build_command_payload(command_content)
 
     headers = {
         "Accept": "application/json",
@@ -90,8 +90,8 @@ if __name__ == "__main__":
     a = requests.post(URL, json=aggregate_payload, headers=headers)
     aggregate_id = a.json()["id"]
 
-    line_payload1 = generate_line(event_id, aggregate_id)
-    line_payload2 = generate_line(command_id, aggregate_id)
+    line_payload1 = build_line_payload(event_id, aggregate_id)
+    line_payload2 = build_line_payload(command_id, aggregate_id)
 
     print("create line from event to aggregate")
     requests.post(CONNECTOR_URL, json=line_payload1, headers=headers)
